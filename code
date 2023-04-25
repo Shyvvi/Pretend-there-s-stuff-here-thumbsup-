@@ -1,0 +1,57 @@
+I'm too lazy to code stuff for this but here's a sample of my spaghetti code nonetheless
+
+package net.shyvv.armormod.item;
+
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.world.World;
+import net.shyvv.armormod.config.ModConfigs;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+
+public class RedHotMetalItem extends Item {
+    public RedHotMetalItem(Settings settings) {
+        super(settings);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        if(!world.isClient()) {
+            PlayerEntity player = (PlayerEntity)entity;
+            if(entity != null && ApronDetect(player)) {
+                if(player.isHolding(ModItems.RED_HOT_NIHILITE)
+                        && ApronDetect(player)) {
+                    player.damage(DamageSource.ON_FIRE, 6.0f);
+                }
+                if(player.isHolding(ModItems.RED_HOT_TRIADEN)
+                        && ApronDetect(player)) {
+                    player.damage(DamageSource.ON_FIRE, 6.0f);
+                }
+            }
+        }
+        super.inventoryTick(stack, world, entity, slot, selected);
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        tooltip.add(Text.literal("Can be quenched in a cauldron filled with water").formatted(Formatting.DARK_GRAY));
+        super.appendTooltip(stack, world, tooltip, context);
+    }
+
+    public boolean ApronDetect(PlayerEntity player) {
+        if(isWearingChestpiece(player) && isWearingApron(player)) {return false;} else {return true;}}
+    private boolean isWearingChestpiece(PlayerEntity player) {
+        ItemStack chestplate = player.getInventory().getArmorStack(2); return !chestplate.isEmpty();}
+    private boolean isWearingApron(PlayerEntity player) {
+        ArmorItem apron = ((ArmorItem)player.getInventory().getArmorStack(2).getItem());return apron.getMaterial() == ModArmorMaterial.BLACKSMITHS_APRON;}
+
+}
